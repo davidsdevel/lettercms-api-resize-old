@@ -35,9 +35,6 @@ const transform = async (url, width = 512, quality = 80) => {
   return r.body.pipe(transform);
 }
 
-
-var whitelist = ['https://lettercms-dashboard-davidsdevel.vercel.app', 'https://lettercms-client-davidsdevel.vercel.app'];
-
 const corsOpts = {
   origin: true,
   methods: ['GET', 'OPTIONS']
@@ -53,7 +50,6 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
 
     if (!isValidToken)
       return res.sendStatus(401);
-
 
     const r = await transform(url, parseInt(w), parseInt(q));
 
