@@ -10,6 +10,8 @@ const cors = require('cors');
 
 const app = express();
 
+const PORT = process.env.PORT || 3003;
+
 const compare = (secret, key) => {
   const [pass, salt] = key.split('.');
 
@@ -63,4 +65,4 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
 });
 
 
-app.listen(3003, () => console.log('> app listen on port 3003'))
+app.listen(PORT, () => console.log(`> app listen on port ${PORT}`))
