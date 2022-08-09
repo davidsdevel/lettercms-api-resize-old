@@ -7,7 +7,6 @@ staging:
   stage: deploy
   script:
     - gem install dpl
-    - rm -rf testing
     - dpl --provider=heroku --app=lettercms-resize --api-key=$HEROKU_API_KEY
   environment:
     name: staging
