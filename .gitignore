@@ -1,0 +1,7 @@
+*.db
+*.webp
+*.jpg
+*.png
+**/node_modules/**
+*.log
+.env
