@@ -7,7 +7,6 @@ staging:
   stage: deploy
   script:
     - curl -fsSL https://get.deta.dev/cli.sh | sh
-    - /root/.deta/bin/deta new --name lettercms-resize --node --project default
     - /root/.deta/bin/deta deploy
   artifacts:
     name: "deta"
