@@ -5,6 +5,6 @@
   "runtime": "nodejs14.x",
   "endpoint": "https://66zadx.deta.dev",
   "region": "sa-east-1",
-  "visor": "disabled",
+  "visor": "enabled",
   "http_auth": "disabled"
 }
