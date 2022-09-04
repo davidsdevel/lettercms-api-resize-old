@@ -5,6 +5,9 @@ const express = require('express');
 const {transform} = require('./lib/image');
 const {getFile, saveFile, normalizeUrl} = require('./lib/cache');
 const cors = require('cors');
+const {createWriteStream} = require('fs');
+const {join} = require('path');
+
 
 const app = express();
 
@@ -23,28 +26,25 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
 
     const key = normalizeUrl(url, {w, q, h});
 
-    const file = await getFile(key);
+    const hasFile = await getFile(key);
 
-    if (file) {
-      res.writeHead(200, {
-       'Content-Type': 'image/webp',
-       'Content-Length': file.buff.length,
-       'Cache-Control': 'public, s-maxage=3600'
-      });
-      
-      return res.end(file.buff);
+    if (hasFile) {
+      return res.sendFile(join(__dirname, 'test.webp'));
     }
+    const str = createWriteStream('test.webp');
+    const {pipe, type} = await transform(url, {width: parseInt(w), heigth: parseInt(h), quality: parseInt(q)});
 
-    const {buff, type} = await transform(url, {width: parseInt(w), heigth: parseInt(h), quality: parseInt(q)});
+    pipe.pipe(str);
 
-    res.writeHead(200, {
-     'Content-Type': 'image/webp',
-     'Content-Length': buff.length
+    let d = []
+    pipe.on('data', async chunk => {
+      d.push(chunk);
     });
-    
-    await saveFile(key, data, type);
+    pipe.on('end', async () => {
+      await saveFile(key, Buffer.concat(d), type);
 
-    res.end(buff); 
+      res.sendFile(join(__dirname, 'test.webp'));
+    });
   } catch(err) {
     console.log(err)
     res.status(500).send(err);
