@@ -31,6 +31,7 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
     if (hasFile) {
       return res.sendFile('/temp/test.webp');
     }
+    
     const str = createWriteStream('/temp/test.webp');
     const {pipe, type} = await transform(url, {width: parseInt(w), heigth: parseInt(h), quality: parseInt(q)});
 
@@ -40,7 +41,7 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
     pipe.on('data', async chunk => {
       d.push(chunk);
     });
-    pipe.on('end', async () => {
+    str.on('end', async () => {
       await saveFile(key, Buffer.concat(d), type);
 
       res.sendFile('/temp/test.webp');
