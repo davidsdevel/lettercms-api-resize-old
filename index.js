@@ -25,7 +25,6 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
 
     const file = await getFile(key);
 
-    
     if (file) {
       res.setHeader('Cache-Control', 'public, s-maxage=31536000');
       res.setHeader('Content-Type', file.type)
@@ -44,10 +43,11 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
     console.log(err)
     res.status(500).send(err);
   }
-});
+})
+.all('*', (req, res) => res.sendStatus(404));
 
 
-if (process.env.NODE_ENV === 'production')
+if (process.env.DETA_RUNTIME)
   module.exports = app;
 else
   app.listen(PORT, HOST, () => console.log(`> app listen on port ${PORT}`));
