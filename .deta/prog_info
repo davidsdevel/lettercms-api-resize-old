@@ -1,1 +1,0 @@
-{"id":"43e7b5f0-966e-4551-aea6-80250c123e5f","space":28987,"runtime":"nodejs14.x","name":"lettercms-resize","path":"66zadx","project":"b0h7cc6e","account":"144798365827","region":"sa-east-1","deps":["express@^4.18.1","isomorphic-unfetch@^3.1.0","node-fetch@^3.2.9","sharp@^0.30.7","cors@^2.8.5","deta@^1.1.0"],"envs":null,"public":true,"log_level":"off","cron":""}
