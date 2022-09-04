@@ -31,7 +31,7 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
     if (hasFile) {
       return res.sendFile('/temp/test.webp');
     }
-    const str = createWriteStream('test.webp');
+    const str = createWriteStream('/temp/test.webp');
     const {pipe, type} = await transform(url, {width: parseInt(w), heigth: parseInt(h), quality: parseInt(q)});
 
     pipe.pipe(str);
