@@ -26,18 +26,25 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
     const file = await getFile(key);
 
     if (file) {
-      res.setHeader('Cache-Control', 'public, s-maxage=31536000');
-      res.setHeader('Content-Type', file.type)
+      res.writeHead(200, {
+       'Content-Type': file.type,
+       'Content-Length': file.buff.length,
+       'Cache-Control': 'public, s-maxage=31536000'
+      });
       
-      return res.send(file.buff);
+      return res.end(file.buff);
     }
 
     const {buff, type} = await transform(url, {width: parseInt(w), heigth: parseInt(h), quality: parseInt(q)});
 
-    res.setHeader('Content-Type', type);
-
-    res.send(buff);
+    res.writeHead(200, {
+     'Content-Type': type,
+     'Content-Length': buff.length
+    });
+    
     await saveFile(key, data, type);
+
+    res.end(buff); 
   } catch(err) {
     console.log(err)
     res.status(500).send(err);
