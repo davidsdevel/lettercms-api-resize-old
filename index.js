@@ -4,8 +4,9 @@ if (!process.env.DETA_RUNTIME && process.env.NODE_ENV !== 'production')
 const express = require('express');
 const {transform} = require('./lib/image');
 const {getFile, saveFile, normalizeUrl} = require('./lib/cache');
+const fetch = require('isomorphic-unfetch')
 const cors = require('cors');
-const {createWriteStream} = require('fs');
+const {createWriteStream, writeFile} = require('fs');
 const {join} = require('path');
 
 
@@ -38,9 +39,7 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
     pipe.pipe(str);
 
     let d = []
-    pipe.on('data', async chunk => {
-      d.push(chunk);
-    });
+    pipe.on('data', async chunk => d.push(chunk));
     str.on('end', async () => {
       await saveFile(key, Buffer.concat(d), type);
 
@@ -50,6 +49,33 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
     console.log(err)
     res.status(500).send(err);
   }
+})
+app.get('/api/download', cors(corsOpts), async (req, res) => {
+
+    const {query: {url}} = req;
+
+    const r = await fetch(url);
+    const w = createWriteStream('/temp/img.jpg');
+
+    r.body.pipe(w);
+
+    r.body.on('end', () => res.sendFile('/temp/img.jpg'))
+
+})
+app.get('/api/stream', cors(corsOpts), async (req, res) => {
+    const {query: {url}} = req;
+
+    const r = await fetch(url);
+
+    r.body.pipe(res);
+})
+app.get('/api/buffer', cors(corsOpts), async (req, res) => {
+    const {query: {url}} = req;
+
+    const r = await fetch(url);
+    const buff = await r.buffer();
+
+    res.end(buff)
 })
 .all('*', (req, res) => res.sendStatus(404));
 
