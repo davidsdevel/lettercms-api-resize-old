@@ -2,40 +2,14 @@ if (process.env.NODE_ENV !== 'production')
   require('dotenv').config();
 
 const express = require('express');
-const path = require('path');
-const fetch = require('isomorphic-unfetch')
-const sharp = require('sharp')
-const {scryptSync, timingSafeEqual} = require('crypto');
+const {transform} = require('./lib/image');
+const {getFile, saveFile, normalizeUrl} = require('./lib/cache');
 const cors = require('cors');
 
 const app = express();
 
 const PORT = process.env.PORT || 3003;
-
-const compare = (secret, key) => {
-  const [pass, salt] = key.split('.');
-
-  const buffer = scryptSync(secret, salt, 64);
-
-  return timingSafeEqual(Buffer.from(pass, 'hex'), buffer);
-}
-
-const transform = async (url, width = 512, quality = 80) => {
-  const r = await fetch(url);
-
-  if (r.status !== 200)
-    return Promise.reject({
-      status: r.status
-    });
-
-  let transform = sharp().webp();
-
-  if (width) {
-    transform = transform.resize({width, quality})
-  }
-
-  return r.body.pipe(transform);
-}
+const HOST =  process.env.HOST || 'localhost';
 
 const corsOpts = {
   origin: true,
@@ -45,24 +19,35 @@ const corsOpts = {
 app.get('/api/resize', cors(corsOpts), async (req, res) => {
   try {
 
-    const {query: {url, w, q, t}} = req;
+    const {query: {url, w, q, h}} = req;
 
-    const token = `${process.env.JWT_AUTH}@${Buffer.from(url).toString('hex')}`;
-    const isValidToken = compare(token, t);
+    const key = normalizeUrl(url, {w, q, h});
 
-    if (!isValidToken)
-      return res.sendStatus(401);
+    const file = await getFile(key);
 
-    const r = await transform(url, parseInt(w), parseInt(q));
+    
+    if (file) {
+      res.setHeader('Cache-Control', 'public, s-maxage=31536000');
+      res.setHeader('Content-Type', file.type)
+      
+      return res.send(file.buff);
+    }
 
-    res.setHeader('cache-control', 'public, max-age=31536000, must-revalidate')
+    const {transformStream, type} = await transform(url, {width: parseInt(w), heigth: parseInt(h), quality: parseInt(q)});
 
-    r.pipe(res);
+    res.on('close', async () => {
+      transformStream.toBuffer((err, data) => saveFile(key, data, type));
+    });
+
+    transformStream.pipe(res);
   } catch(err) {
-    if (err.status !== 200)
-      res.sendStatus(err.status);
+    console.log(err)
+    res.status(500).send(err);
   }
 });
 
 
-app.listen(PORT, () => console.log(`> app listen on port ${PORT}`))
+if (process.env.NODE_ENV === 'production')
+  module.exports = app;
+else
+  app.listen(PORT, HOST, () => console.log(`> app listen on port ${PORT}`));
