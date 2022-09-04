@@ -36,12 +36,10 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
 
     res.setHeader('Content-Type', type);
 
-    res.on('close', async () => {
-      transformStream.toBuffer((err, data) => saveFile(key, data, type));
+    transformStream.toBuffer(async (err, data) => {
+      await saveFile(key, data, type)
+      res.send(data);
     });
-
-
-    transformStream.pipe(res);
   } catch(err) {
     console.log(err)
     res.status(500).send(err);
