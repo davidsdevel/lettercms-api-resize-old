@@ -55,6 +55,7 @@ app.get('/api/download', cors(corsOpts), async (req, res) => {
     const {query: {url}} = req;
 
     const r = await fetch(url);
+    res.setHeader('Content-Type', 'image/jpeg')
     const w = createWriteStream('/temp/img.jpg');
 
     r.body.pipe(w);
@@ -66,6 +67,7 @@ app.get('/api/stream', cors(corsOpts), async (req, res) => {
     const {query: {url}} = req;
 
     const r = await fetch(url);
+    res.setHeader('Content-Type', 'image/jpeg')
 
     r.body.pipe(res);
 })
@@ -73,6 +75,7 @@ app.get('/api/buffer', cors(corsOpts), async (req, res) => {
     const {query: {url}} = req;
 
     const r = await fetch(url);
+    res.setHeader('Content-Type', 'image/jpeg')
     const buff = await r.buffer();
 
     res.end(buff)
