@@ -7,7 +7,7 @@ staging:
   stage: deploy
   script:
     - curl -fsSL https://get.deta.dev/cli.sh | sh
-    - deta deploy
+    - /root/.deta/bin/deta deploy
   environment:
     name: staging
     url: https://lettercms-resize.deta.sh
