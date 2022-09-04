@@ -1,4 +1,4 @@
-image: ruby:2.6
+image: node:lts-alpine
 
 stages:
   - deploy
@@ -6,10 +6,10 @@ stages:
 staging:
   stage: deploy
   script:
-    - gem install dpl
-    - dpl --provider=heroku --app=lettercms-resize --api-key=$HEROKU_API_KEY
+    - curl -fsSL https://get.deta.dev/cli.sh | sh
+    - deta deploy
   environment:
     name: staging
-    url: https://lettercms-resize.herokuapp.com
+    url: https://lettercms-resize.deta.sh
   only:
     - main
