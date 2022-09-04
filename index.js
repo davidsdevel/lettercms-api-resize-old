@@ -27,9 +27,9 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
 
     if (file) {
       res.writeHead(200, {
-       'Content-Type': file.type,
+       'Content-Type': 'image/webp',
        'Content-Length': file.buff.length,
-       'Cache-Control': 'public, s-maxage=31536000'
+       'Cache-Control': 'public, s-maxage=3600'
       });
       
       return res.end(file.buff);
@@ -38,7 +38,7 @@ app.get('/api/resize', cors(corsOpts), async (req, res) => {
     const {buff, type} = await transform(url, {width: parseInt(w), heigth: parseInt(h), quality: parseInt(q)});
 
     res.writeHead(200, {
-     'Content-Type': type,
+     'Content-Type': 'image/webp',
      'Content-Length': buff.length
     });
     

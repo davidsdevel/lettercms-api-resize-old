@@ -7,14 +7,12 @@ staging:
   stage: deploy
   script:
     - curl -fsSL https://get.deta.dev/cli.sh | sh
-    - /root/.deta/bin/deta new --name lettercms-resize --project default --node
-    - /root/.deta/bin/deta visor enable
     - /root/.deta/bin/deta deploy
   cache:
     key: lettercms-resize
     paths:
-      - node_modules
       - .deta
+      - deta.json
   environment:
     name: staging
     url: https://lettercms-resize.deta.sh
