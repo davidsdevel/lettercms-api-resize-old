@@ -3,5 +3,5 @@
     "runtime": "nodejs16.x",
     "endpoint": "https://lettercms-resize.deta.dev",
     "visor": "enabled",
-    "http_auth": "enabled"
+    "http_auth": "disabled"
 }
